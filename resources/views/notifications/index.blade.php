@@ -1,0 +1,7 @@
+@extends('layouts.app')
+@section('title', 'Notifications')
+@section('crumb', 'Notifications')
+@section('content')
+<section class="head"><div><div class="eyebrow">Updates</div><h1>Notifications</h1><p>Approvals, participant activity, and event result updates.</p></div>@if(auth()->user()->unreadNotifications()->exists())<form method="POST" action="{{ route('notifications.read-all') }}">@csrf<button class="btn secondary">Mark all read</button></form>@endif</section>
+<section class="panel">@if($notifications->isEmpty())<div class="empty">You’re all caught up. New workflow updates will appear here.</div>@else<div class="table-wrap"><table><thead><tr><th>Update</th><th>Received</th><th>Status</th><th></th></tr></thead><tbody>@foreach($notifications as $notification)<tr><td><strong>{{ $notification->data['title'] ?? 'Update' }}</strong><div class="muted">{{ $notification->data['message'] ?? '' }}</div></td><td>{{ $notification->created_at->diffForHumans() }}</td><td><span class="pill {{ $notification->read_at?'':'pending' }}">{{ $notification->read_at?'Read':'New' }}</span></td><td>@if(!$notification->read_at)<form method="POST" action="{{ route('notifications.read',$notification->id) }}">@csrf<button class="btn secondary" style="padding:6px 9px;font-size:10px">Open</button></form>@else<a class="text-link" style="color:#6658d3" href="{{ $notification->data['url'] ?? route('dashboard') }}">Open</a>@endif</td></tr>@endforeach</tbody></table></div><div class="pagination">{{ $notifications->links() }}</div>@endif</section>
+@endsection
